@@ -12,7 +12,6 @@ public class TestDao {
 		System.out.println(dao.listAllFoods());
 		
 		System.out.println("Printing all the portions...");
-		System.out.println(dao.listAllPortions());
 	}
 
 }
