@@ -1,5 +1,6 @@
 package it.polito.tdp.food.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,8 @@ public class Model {
 	private FoodDao dao;
 	private Map<Integer, Portion> idMap;
 	private List<String> vertici;
+	private List<String> best;
+	private double pesoMax;
 	
 	public Model() {
 		dao = new FoodDao();
@@ -64,6 +67,65 @@ public class Model {
 
 	public Graph<String, DefaultWeightedEdge> getGrafo() {
 		return grafo;
+	}
+	
+	public void cercaCammino(String partenza, int N){
+//		inizializzo la best e il peso max
+		
+		this.best = null;
+		this.pesoMax = 0.0;
+		
+//		Creo la mia soluzione parziale
+		List<String> parziale = new ArrayList<>();
+		
+//		ci aggiungo la partenza dato che la so
+		
+		parziale.add(partenza);
+//		avvio la ricorsione
+		
+		cerca(parziale, 1, N);
+		
+		
+		
+	}
+
+	private void cerca(List<String> parziale, int livello, int N) {
+//		condizioni di terminazione
+		if(livello == N+1) {
+//			controllo se il peso che ho è maggiore di quello di prima
+			double peso = trovaPeso(parziale);
+			if(peso > this.getPesoMax()) {
+				this.pesoMax = peso;
+				best = new ArrayList<>(parziale);
+			}
+			return;
+		}
+		
+		for(String s : Graphs.neighborListOf(this.grafo, parziale.get(livello-1))) {
+			if(!parziale.contains(s)) {
+				parziale.add(s);
+				cerca(parziale, livello+1, N);
+				parziale.remove(parziale.size()-1);
+			}
+		}
+		
+	}
+
+	private double trovaPeso(List<String> parziale) {
+		double peso = 0.0;
+		for(int i=1; i<parziale.size(); i++) {
+			double p = this.grafo.getEdgeWeight(this.grafo.getEdge(parziale.get(i-1), parziale.get(i)));
+			peso += p;
+		}
+		return peso;
+	}
+
+	public double getPesoMax() {
+		return pesoMax;
+	}
+
+	public List<String> getBest() {
+		return best;
 	}
 	
 	
